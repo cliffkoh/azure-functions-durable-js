@@ -115,9 +115,13 @@ export class Orchestrator {
                     return;
                 }
 
-                decisionStartedEvent = state.find((e) =>
-                    e.EventType === HistoryEventType.OrchestratorStarted &&
-                    e.Timestamp > decisionStartedEvent.Timestamp);
+                decisionStartedEvent = state.find((e) => {
+                    if (!e || !decisionStartedEvent) {
+                        context.log(JSON.stringify(state));
+                    }
+                    return e.EventType === HistoryEventType.OrchestratorStarted &&
+                        e.Timestamp > decisionStartedEvent.Timestamp;
+                });
                 context.df.currentUtcDateTime = this.currentUtcDateTime = decisionStartedEvent
                     ? new Date(decisionStartedEvent.Timestamp)
                     : undefined;
