@@ -115,16 +115,20 @@ export class Orchestrator {
                     return;
                 }
 
-                decisionStartedEvent = state.find((e) => {
+                const newDecisionStartedEvent = state.find((e) => {
                     if (!e || !decisionStartedEvent) {
+                        context.log(`CRASH | e: ${JSON.stringify(e)} | decisionStartedEvent: ${JSON.stringify(decisionStartedEvent)}`);
                         context.log(JSON.stringify(state));
                     }
-                    return e.EventType === HistoryEventType.OrchestratorStarted &&
-                        e.Timestamp > decisionStartedEvent.Timestamp;
+
+                    return e.EventType === 12 && e.Timestamp > decisionStartedEvent.Timestamp;
                 });
+
+                decisionStartedEvent = newDecisionStartedEvent || decisionStartedEvent;
+
                 context.df.currentUtcDateTime = this.currentUtcDateTime = decisionStartedEvent
-                    ? new Date(decisionStartedEvent.Timestamp)
-                    : undefined;
+                ? new Date(decisionStartedEvent.Timestamp)
+                : undefined;
 
                 g = gen.next(partialResult ? partialResult.result : undefined);
             }
